@@ -145,5 +145,7 @@
   "snapshots": 1,
   "source_status": "REPLAY COMPLETE | recorded synthetic scenario",
   "stale": false,
-  "t_sec": 150.0
+  "t_sec": 150.0,
+  "ui": "Dear ImGui",
+  "ui_frames": 394
 }

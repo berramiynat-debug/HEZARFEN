@@ -20,32 +20,8 @@ SimdisScene::~SimdisScene() {
 void SimdisScene::initialize(simVis::Viewer* viewer) {
     viewer_ = viewer; scene_ = viewer->getSceneManager();
     scene_->getScenario()->bind(&dataStore_);
-    auto* view = viewer->getMainView();
     viewer->setNavigationMode(simVis::NAVMODE_ROTATEPAN);
-    hud_ = std::make_unique<simUtil::HudManager>(view,view->getOrCreateHUD());
-    auto title = hud_->createText("HEZARFEN | SIMDIS Mission Visualization",2,98,true,
-        simUtil::ALIGN_LEFT,simUtil::ALIGN_TOP,osg::Vec4(.7f,.9f,1,1),"arial.ttf",21);
-    title->setBackgroundColor(osg::Vec4(.02f,.04f,.08f,.85f));
-    statusText_ = hud_->createText("WAITING FOR SNAPSHOT",2,93,true,simUtil::ALIGN_LEFT,
-        simUtil::ALIGN_TOP,simVis::Color::Yellow,"arial.ttf",15);
-    rosterText_ = hud_->createText("",2,84,true,simUtil::ALIGN_LEFT,simUtil::ALIGN_TOP,
-        simVis::Color::White,"arial.ttf",13);
-    eventText_ = hud_->createText("",2,37,true,simUtil::ALIGN_LEFT,simUtil::ALIGN_TOP,
-        simVis::Color::White,"arial.ttf",12);
-    for (auto* t : {statusText_.get(),rosterText_.get(),eventText_.get()})
-        t->setBackgroundColor(osg::Vec4(.02f,.04f,.08f,.82f));
-    const std::pair<const char*,uint32_t> legend[] = {{"Trusted",0x00FF00FF},{"Watch",0xFFFF00FF},
-        {"Restricted",0xFF8000FF},{"Quarantined",0xFF0000FF},{"Revoked",0x808080FF}};
-    double y = 55;
-    for (const auto& [name,color] : legend) {
-        osg::Vec4 c(float((color >> 24)&255)/255,float((color >> 16)&255)/255,float((color >> 8)&255)/255,1);
-        auto t = hud_->createText(name,98,y,true,simUtil::ALIGN_RIGHT,simUtil::ALIGN_TOP,c,"arial.ttf",13);
-        t->setBackgroundColor(osg::Vec4(.02f,.04f,.08f,.8f)); y -= 3.3;
-    }
-    auto help = hud_->createText("SYNTHETIC DEMONSTRATOR | backend decisions only\nDrag: rotate/pan | Wheel: zoom | Home: mission | 1: perspective | 2: overhead | Esc: exit",
-        2,3,true,simUtil::ALIGN_LEFT,simUtil::ALIGN_BOTTOM,simVis::Color::White,"arial.ttf",12);
-    help->setBackgroundColor(osg::Vec4(.02f,.04f,.08f,.8f));
-    home(); refreshHud();
+    home();
 }
 void SimdisScene::pushUpdate(SceneUpdate update) {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -58,21 +34,33 @@ void SimdisScene::stop() { stopped_ = true; }
 void SimdisScene::onFrameUpdate() {
     std::deque<SceneUpdate> updates;
     { std::lock_guard<std::mutex> lock(mutex_); updates.swap(queue_); }
-    bool changed = false;
     for (const auto& update : updates) {
         if (!update.status.empty()) {
             sourceStatus_ = update.status;
             if (update.disconnect) state_.disconnected(update.status);
-            changed = true;
         }
         if (update.message && state_.apply(*update.message)) {
-            renderState(); changed = true;
+            renderState();
             if (update.message->security || update.message->link || update.message->type == "CONTACT_EVENT")
                 std::cout << "[HEZARFEN] " << state_.events.back() << std::endl;
             if (!positioned_ && !state_.platforms.empty()) { home(); positioned_ = true; }
         }
     }
-    if (changed) refreshHud();
+    switch (cameraAction_) {
+    case CameraAction::Mission: home(); break;
+    case CameraAction::Selected: {
+        auto it = state_.platforms.find(selected_);
+        if(it != state_.platforms.end()) {
+            const auto& p = it->second.value;
+            viewer_->getMainView()->lookAt(p.lat_deg,p.lon_deg,p.alt_m,0,-45,1800);
+        }
+        break;
+    }
+    case CameraAction::Perspective: viewer_->getMainView()->enableOverheadMode(false); break;
+    case CameraAction::Overhead: viewer_->getMainView()->enableOverheadMode(true); break;
+    default: break;
+    }
+    cameraAction_=CameraAction::None;
 }
 simData::ObjectId SimdisScene::getOrCreate(const std::string& key, const std::string& kind) {
     auto it = ids_.find(key); if (it != ids_.end()) return it->second;
@@ -141,25 +129,6 @@ void SimdisScene::renderState() {
     }
     dataStore_.update(state_.time);
 }
-void SimdisScene::refreshHud() {
-    std::ostringstream status;
-    status << mode_ << " | " << (state_.stale ? state_.status : state_.status + " | DATA CURRENT")
-        << "\nt=" << std::fixed << std::setprecision(1) << state_.time << " s | seq=" << state_.seq;
-    if (!state_.runId.empty()) status << " | run=" << state_.runId;
-    if (mode_ == "REPLAY") status << "\n" << sourceStatus_;
-    statusText_->setText(status.str()); statusText_->setColor(state_.stale ? simVis::Color::Red : simVis::Color::White);
-    std::ostringstream roster; roster << "PLATFORMS / BACKEND STATE\n";
-    for (const auto& [id,p] : state_.platforms)
-        roster << id << "  " << p.value.kind << "  " << securityStateLabel(p.value.sec)
-            << " | LINK " << p.link << " | " << int(p.value.alt_m) << " m\n";
-    roster << "\nSURFACE CONTACTS: " << state_.contacts.size();
-    for (const auto& [id,c] : state_.contacts) roster << "\n" << id << " " << c.status << " | " << c.source;
-    rosterText_->setText(roster.str());
-    std::string events = "LATEST BACKEND EVENTS (ordered)\n";
-    if (state_.events.empty()) events += "Awaiting backend events";
-    for (const auto& e : state_.events) events += e + "\n";
-    eventText_->setText(events);
-}
 void SimdisScene::home() {
     if (!viewer_.valid()) return;
     double lat = 40.567, lon = 27.506;
@@ -171,7 +140,7 @@ void SimdisScene::home() {
     viewer_->getMainView()->lookAt(lat,lon - .004,0,0,-55,4800);
 }
 void SimdisScene::writeReport(const std::string& path) const {
-    nlohmann::json j = {{"project","HEZARFEN"},{"mode",mode_},{"seq",state_.seq},{"t_sec",state_.time},
+    nlohmann::json j = {{"project","HEZARFEN"},{"ui","Dear ImGui"},{"ui_frames",uiFrames_},{"mode",mode_},{"seq",state_.seq},{"t_sec",state_.time},
         {"stale",state_.stale},{"awaiting_snapshot",state_.awaitingSnapshot},{"applied",state_.applied},
         {"security_events",state_.securityEvents},{"snapshots",state_.snapshots},{"source_status",sourceStatus_},
         {"platforms",nlohmann::json::array()},{"contacts",nlohmann::json::array()},{"events",state_.events}};

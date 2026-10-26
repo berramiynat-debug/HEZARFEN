@@ -1,5 +1,5 @@
 {
-  "applied": 43,
+  "applied": 42,
   "awaiting_snapshot": false,
   "contacts": [],
   "events": [],
@@ -132,5 +132,7 @@
   "snapshots": 2,
   "source_status": "TCP CONNECTED | WAITING FOR SNAPSHOT",
   "stale": false,
-  "t_sec": 0.0
+  "t_sec": 0.0,
+  "ui": "Dear ImGui",
+  "ui_frames": 537
 }

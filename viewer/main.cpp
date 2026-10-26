@@ -1,4 +1,5 @@
 #include "EventHandler.h"
+#include "ImGuiLayer.h"
 #include "TcpClient.h"
 #include "Replay.h"
 #include "simCore/Common/Version.h"
@@ -84,7 +85,10 @@ int main(int argc, char** argv) {
         hezarfen::SimdisScene scene(replay.empty() ? "LIVE TCP" : "REPLAY");
         scene.initialize(viewer.get());
         view->addEventHandler(new hezarfen::FrameUpdateHandler(scene,viewer.get(),quitAfter));
-        if (!capture.empty()) view->getOrCreateHUD()->setFinalDrawCallback(new Capture(capture,captureAt));
+        osg::ref_ptr<hezarfen::ImGuiLayer> gui = new hezarfen::ImGuiLayer([&]() { scene.drawPanel(); });
+        view->getEventHandlers().emplace_front(gui.get());
+        gui->install(view->getOrCreateHUD());
+        if (!capture.empty()) view->getOrCreateHUD()->addFinalDrawCallback(new Capture(capture,captureAt));
         view->getViewManager()->getViewer()->realize();
         osgViewer::ViewerBase::Windows windows;
         view->getViewManager()->getViewer()->getWindows(windows);
@@ -113,6 +117,10 @@ int main(int argc, char** argv) {
         if (replayThread.joinable()) replayThread.join();
         scene.onFrameUpdate();
         if (!report.empty()) scene.writeReport(report);
+        if (windows.front()->makeCurrent()) {
+            gui->shutdown();
+            windows.front()->releaseContext();
+        }
         return result;
     } catch (const std::exception& e) {
         std::cerr << "[HEZARFEN] ERROR: " << e.what() << std::endl; return 1;

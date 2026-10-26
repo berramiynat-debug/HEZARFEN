@@ -11,8 +11,8 @@
 [HEZARFEN] TCP DISCONNECTED
 [HEZARFEN] CONNECTING 127.0.0.1:5556
 [HEZARFEN] TCP: socket error
-[HEZARFEN] OpenGL renderer: NVIDIA GeForce 940MX/PCIe/SSE2; version 3.3.0 NVIDIA 582.66
 [HEZARFEN] CONNECTING 127.0.0.1:5556
+[HEZARFEN] OpenGL renderer: NVIDIA GeForce 940MX/PCIe/SSE2; version 3.3.0 NVIDIA 582.66
 [HEZARFEN] Actual framebuffer captured: D:\Projects\HEZARFEN\viewer\evidence\reconnect.png
 [HEZARFEN] TCP: socket error
 [HEZARFEN] CONNECTING 127.0.0.1:5556

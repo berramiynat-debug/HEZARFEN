@@ -63,6 +63,7 @@ def finished(handles, name, timeout):
     assert result == 0, (name, result, (BUILD / (name + '.stderr.log')).read_text())
     assert (EVIDENCE / (name + '.png')).stat().st_size > 20000
     report = json.loads((EVIDENCE / (name + '.json')).read_text())
+    assert report['ui'] == 'Dear ImGui' and report['ui_frames'] > 0
     assert len(report['platforms']) == 6
     assert all(p['sdk_active'] for p in report['platforms'])
     for p in report['platforms']:

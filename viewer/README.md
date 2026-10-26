@@ -54,6 +54,20 @@ Replay validates the complete JSONL stream first, preserves message order and re
 
 Camera: drag to rotate/pan, wheel to zoom, **Home** to recenter on the platforms, **1** perspective, **2** overhead, **Esc** exit. Ships and USVs use the SDK surface model at the received zero altitude; UAVs use the SDK airplane model at received positive altitudes. The command ship is larger than the USVs. Labels retain platform identity and current state; UAV-02 also retains its latest mission-command result.
 
+## Dear ImGui mission monitor
+
+The presentation UI is rendered with Dear ImGui **inside this C++ SIMDIS viewer**, owned by `feat/simdis-viewer`. The backend remains unchanged. The native 3D map and SDK models remain visible beside a dark mission monitor.
+
+- Select a platform row and press **Focus** to inspect its actual position. Hover a row for role, WGS84 coordinates, heading and the latest command decision.
+- **Mission**, **3D** and **2D** control the native SDK camera. Actions are applied on the next viewer update, not during UI drawing.
+- The platform table shows independent security and link states. Contacts retain backend status and provenance. Expand **Security legend** for all supported colors.
+- The scrollable event list preserves backend order. Search by platform, event ID, result, reason or evidence; **Follow** keeps new events in view. These controls only change the observer display.
+- UI mouse/keyboard capture prevents camera gestures while interacting with a panel. Clicking the exposed SIMDIS scene returns normal camera control.
+
+CMake compiles the SDK dependency's Dear ImGui 1.92.4 sources and OpenGL3 backend. The default is `${SIMDIS_THIRD_PARTY_DIR}/ImGui/1.92.4`; override `-DIMGUI_SOURCE_DIR=<imgui-source-directory>` if needed. No ImGui DLL or Python UI is used. ImGui's license remains with the installed dependency source. Missing sources produce an explicit configure error.
+
+The application report includes `ui=Dear ImGui` and the number of UI frames rendered. Framebuffer captures are taken **after** ImGui rendering, so evidence includes the actual panels.
+
 ## Protocol and rendering
 
 No `docs/protocol.md` exists in the backend branch. The integration follows `backend/tcp_server.py` and `backend/README.md`:
@@ -63,9 +77,9 @@ No `docs/protocol.md` exists in the backend branch. The integration follows `bac
 - v1 types: SNAPSHOT, DELTA, SECURITY_EVENT, CONTACT_EVENT, LINK_EVENT, HEARTBEAT. Required fields, numeric ranges, enums, UTF-8, duplicate JSON keys and bounded nesting are validated. Full JSON parsing uses vendored nlohmann/json 3.11.3 under its included MIT license.
 - Only a fresh SNAPSHOT clears **STALE DATA** after connection/reconnection. The backend automatically sends it on connect. The feed is one-way; the viewer sends no unsupported request bytes. A five-second receive timeout detects silent peers.
 - Sequence numbers must increase within a connection; a reconnect permits the fresh snapshot's sequence to restart. Repeated/out-of-order events are ignored. Snapshots replace platform/contact state, restore default UP connectivity, and subsequent LINK_EVENT messages restore any current outage. SDK identifiers stay stable for retained platform IDs.
-- Parsed events cross a mutex-protected queue. All datastore, preferences, HUD and scene operations run on the viewer thread. Queue overflow is reported and forces resynchronization; security events are never silently dropped to make room for telemetry.
+- Parsed events cross a mutex-protected queue. All datastore, preferences, ImGui and scene operations run on the viewer thread. Queue overflow is reported and forces resynchronization; security events are never silently dropped to make room for telemetry.
 - WGS84 latitude/longitude degrees and ellipsoid altitude meters pass through `simCore::CoordinateConverter::convertGeodeticToEcef()`. Heading is converted with the orientation to earth-centric radians. The datastore receives ECEF meters, verified through actual `simVis::PlatformNode::update()` readback. `View::lookAt()` uses **latitude, longitude** order in this SDK.
-- Each received position replaces the SDK static TSPI sample (`time=-1`). The scene holds the last received position during idle/disconnect; it does not extrapolate motion or security decisions. The HUD separately preserves backend `t_sec`, `seq`, and optional `run_id`.
+- Each received position replaces the SDK static TSPI sample (`time=-1`). The scene holds the last received position during idle/disconnect; it does not extrapolate motion or security decisions. The mission monitor separately preserves backend `t_sec`, `seq`, and optional `run_id`.
 - SDK model overrides, label colors and native circle highlights show Trusted green, Watch yellow, Restricted orange, Quarantined red, Revoked gray. The current backend produces only Trusted/Watch/Restricted. The viewer never invents a quarantine or revocation.
 - Link UP/DOWN is an independent label/roster field and never changes security color/state. Contact status/source come directly from the backend. The latest events show sequence, time, event ID, result, scope, reason and evidence references; historical audit details remain in backend recordings.
 - Actual backend restrictions use `Restricted` state with backend decision results such as `REJECTED`; the viewer does not require the illustrative `APPLIED` result to display an explicit state. It supports that result for compatible recordings as well.

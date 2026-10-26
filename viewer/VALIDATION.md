@@ -65,8 +65,18 @@ Each PNG is a single capture at the requested wall-clock offset. The matching JS
 - A second window resize could crop the HUD on this display. The application now creates a 1200-by-650 window once; the final full-frame captures were verified without clipping.
 - Desktop UI automation access timed out. Validation used the application's actual framebuffer capture plus SDK node readback and native process execution instead.
 
+## Dear ImGui update
+
+The old text HUD has been replaced by a native Dear ImGui 1.92.4 mission monitor in the same SIMDIS application. It includes independent security/link columns, selectable platform rows, platform tooltips, camera controls, expandable legend, and a scrollable event list with text filtering and optional follow. Follow scrolls only when a new backend event arrives, rather than on every telemetry sequence. Backend protocol and source are unchanged.
+
+The integration check now requires `ui=Dear ImGui` and `ui_frames>0` in each application report. Live, disconnect/reconnect and all-913-message replay checks passed with the ImGui renderer. PNGs were regenerated from the actual framebuffer after the ImGui draw callback; the map and SDK entities remain native SIMDIS. The ImGui OpenGL3 backend is compiled directly from the installed SDK dependency sources; its source directory is configurable in CMake.
+
+The ImGui display dimensions come from the actual graphics window traits. This avoids using the smaller temporary GL viewport left by other rendering passes, which initially misplaced/cropped panels. Header layout and the full sidebar were visually verified at 1200 by 650 pixels. Texture binding and pixel-unpack state are preserved around ImGui dynamic font updates so SDK glyph uploads cannot corrupt the UI font atlas. The original native TCP/state/coordinate test results remain applicable; UI integration adds no security rules.
+
+Desktop automation access to the application was not approved, so mouse/keyboard gestures were not exercised automatically. Rendering, native scene state, streaming, stale status, reconnect and replay were verified through application execution and framebuffer/readback evidence.
+
 ## Remaining limits
 
 There are no unresolved compile, link, live TCP, reconnect or offline replay failures in the tested configuration. SDK sometimes prints `GraphicsWindowWin32::grabFocus() - Failed grabbing the focus` for background test launches; the window still creates, renders, captures and exits successfully.
 
-The bundled global Earth imagery is coarse at mission scale; no high-resolution Marmara terrain package is installed. SDK dependencies/data remain external, and no standalone redistributable package is claimed. Mouse gestures and keyboard camera shortcuts are implemented but were not automated through the desktop tool. Quarantined/Revoked colors are supported by the observer; the current backend does not generate those states. Display positions use the last received sample without interpolation. The viewer does not perform real authentication, authorization, threat detection, corroboration or experimental validation.
+The bundled global Earth imagery is coarse at mission scale; no high-resolution Marmara terrain package is installed. SDK dependencies/data remain external, and no standalone redistributable package is claimed. Mouse gestures, keyboard shortcuts and ImGui interactions are implemented but were not automated through the desktop tool. Quarantined/Revoked colors are supported by the observer; the current backend does not generate those states. Display positions use the last received sample without interpolation. The viewer does not perform real authentication, authorization, threat detection, corroboration or experimental validation.
