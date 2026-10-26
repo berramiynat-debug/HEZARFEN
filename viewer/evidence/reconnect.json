@@ -1,0 +1,136 @@
+{
+  "applied": 43,
+  "awaiting_snapshot": false,
+  "contacts": [],
+  "events": [],
+  "mode": "LIVE TCP",
+  "platforms": [
+    {
+      "alt_m": 0.0,
+      "ecef_m": [
+        4303974.742680211,
+        2241117.965044606,
+        4125423.9719364806
+      ],
+      "id": "CMD-01",
+      "lat_deg": 40.56,
+      "link": "UP",
+      "lon_deg": 27.50639426798458,
+      "sdk_active": true,
+      "sdk_id": 1,
+      "sdk_position_m": [
+        4303974.742680211,
+        2241117.965044606,
+        4125423.9719364806
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 210.0,
+      "ecef_m": [
+        4303702.553581049,
+        2240578.8458537613,
+        4126319.7740188204
+      ],
+      "id": "UAV-01",
+      "lat_deg": 40.569,
+      "link": "UP",
+      "lon_deg": 27.502232107381488,
+      "sdk_active": true,
+      "sdk_id": 2,
+      "sdk_position_m": [
+        4303702.553581049,
+        2240578.8458537613,
+        4126319.7740188204
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 230.0,
+      "ecef_m": [
+        4303323.118615474,
+        2240871.3092117966,
+        4126585.8432708997
+      ],
+      "id": "UAV-02",
+      "lat_deg": 40.572,
+      "link": "UP",
+      "lon_deg": 27.50736471214164,
+      "sdk_active": true,
+      "sdk_id": 3,
+      "sdk_position_m": [
+        4303323.118615474,
+        2240871.3092117966,
+        4126585.8432708997
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 250.0,
+      "ecef_m": [
+        4303167.776685267,
+        2240733.354314456,
+        4126851.9029002953
+      ],
+      "id": "UAV-03",
+      "lat_deg": 40.575,
+      "link": "UP",
+      "lon_deg": 27.50676699487423,
+      "sdk_active": true,
+      "sdk_id": 4,
+      "sdk_position_m": [
+        4303167.776685267,
+        2240733.354314456,
+        4126851.9029002953
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 0.0,
+      "ecef_m": [
+        4304022.8964443775,
+        2240556.3840253837,
+        4125677.0584097016
+      ],
+      "id": "USV-01",
+      "lat_deg": 40.563,
+      "link": "UP",
+      "lon_deg": 27.500250107552226,
+      "sdk_active": true,
+      "sdk_id": 5,
+      "sdk_position_m": [
+        4304022.8964443775,
+        2240556.3840253837,
+        4125677.0584097016
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 0.0,
+      "ecef_m": [
+        4303732.965251678,
+        2240644.151873826,
+        4125930.133671879
+      ],
+      "id": "USV-02",
+      "lat_deg": 40.566,
+      "link": "UP",
+      "lon_deg": 27.50275029318369,
+      "sdk_active": true,
+      "sdk_id": 6,
+      "sdk_position_m": [
+        4303732.965251678,
+        2240644.151873826,
+        4125930.133671879
+      ],
+      "security_state": "Trusted"
+    }
+  ],
+  "project": "HEZARFEN",
+  "security_events": 0,
+  "seq": 42,
+  "snapshots": 2,
+  "source_status": "TCP CONNECTED | WAITING FOR SNAPSHOT",
+  "stale": false,
+  "t_sec": 0.0
+}

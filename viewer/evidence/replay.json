@@ -1,0 +1,149 @@
+{
+  "applied": 913,
+  "awaiting_snapshot": false,
+  "contacts": [
+    {
+      "id": "CONTACT-01",
+      "source": "UAV-02",
+      "status": "Unverified"
+    }
+  ],
+  "events": [
+    "#546 t=90 EV-005 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SENDER_NOT_AUTHORIZED | evidence: MSG-0005",
+    "#547 t=90 EV-006 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0006",
+    "#548 t=90 EV-007 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0007",
+    "#549 t=90 EV-008 UAV-02 MESSAGE_ACCEPTED ACCEPTED\n  SAFETY_TELEMETRY | ROLE_PERMITTED | evidence: MSG-0008",
+    "#670 UAV-03 LINK DOWN | SYNTHETIC_LINK_OUTAGE",
+    "#791 UAV-03 LINK UP | SYNTHETIC_LINK_RESTORED"
+  ],
+  "mode": "REPLAY",
+  "platforms": [
+    {
+      "alt_m": 0.0,
+      "ecef_m": [
+        4303627.815748267,
+        2241784.0980773913,
+        4125423.9719364806
+      ],
+      "id": "CMD-01",
+      "lat_deg": 40.56,
+      "link": "UP",
+      "lon_deg": 27.515262384521687,
+      "sdk_active": true,
+      "sdk_id": 1,
+      "sdk_position_m": [
+        4303627.815748267,
+        2241784.0980773913,
+        4125423.9719364806
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 210.0,
+      "ecef_m": [
+        4303965.3084977325,
+        2243350.601475874,
+        4124551.266669789
+      ],
+      "id": "UAV-01",
+      "lat_deg": 40.54803833652835,
+      "link": "UP",
+      "lon_deg": 27.529822595179088,
+      "sdk_active": true,
+      "sdk_id": 2,
+      "sdk_position_m": [
+        4303965.3084977325,
+        2243350.601475874,
+        4124551.266669789
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 230.0,
+      "ecef_m": [
+        4304203.752142292,
+        2243193.238782318,
+        4124419.8867721404
+      ],
+      "id": "UAV-02",
+      "lat_deg": 40.54632731016467,
+      "link": "UP",
+      "lon_deg": 27.526874320197386,
+      "sdk_active": true,
+      "sdk_id": 3,
+      "sdk_position_m": [
+        4304203.752142292,
+        2243193.238782318,
+        4124419.8867721404
+      ],
+      "security_state": "Restricted"
+    },
+    {
+      "alt_m": 250.0,
+      "ecef_m": [
+        4304606.529716271,
+        2242447.1013354645,
+        4124436.138934672
+      ],
+      "id": "UAV-03",
+      "lat_deg": 40.54636583519009,
+      "link": "UP",
+      "lon_deg": 27.51686614007841,
+      "sdk_active": true,
+      "sdk_id": 4,
+      "sdk_position_m": [
+        4304606.529716271,
+        2242447.1013354645,
+        4124436.138934672
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 0.0,
+      "ecef_m": [
+        4303799.545510677,
+        2241258.006295993,
+        4125529.9532360374
+      ],
+      "id": "USV-01",
+      "lat_deg": 40.561256249698516,
+      "link": "UP",
+      "lon_deg": 27.5088163225262,
+      "sdk_active": true,
+      "sdk_id": 5,
+      "sdk_position_m": [
+        4303799.545510677,
+        2241258.006295993,
+        4125529.9532360374
+      ],
+      "security_state": "Trusted"
+    },
+    {
+      "alt_m": 0.0,
+      "ecef_m": [
+        4303648.323082958,
+        2241333.412879113,
+        4125645.957478037
+      ],
+      "id": "USV-02",
+      "lat_deg": 40.562631333091915,
+      "link": "UP",
+      "lon_deg": 27.510430802303254,
+      "sdk_active": true,
+      "sdk_id": 6,
+      "sdk_position_m": [
+        4303648.323082958,
+        2241333.412879113,
+        4125645.957478037
+      ],
+      "security_state": "Trusted"
+    }
+  ],
+  "project": "HEZARFEN",
+  "security_events": 8,
+  "seq": 913,
+  "snapshots": 1,
+  "source_status": "REPLAY COMPLETE | recorded synthetic scenario",
+  "stale": false,
+  "t_sec": 150.0
+}
