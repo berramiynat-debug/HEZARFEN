@@ -1,0 +1,9 @@
+{"t_sec":0.0,"message_id":"MSG-0001","sender":"CMD-01","receiver":"USV-01","command":"TASK_ASSIGNMENT","policy_rule":"RBAC-01","decision":"ACCEPTED","reason":"ROLE_PERMITTED"}
+{"t_sec":30.0,"message_id":"MSG-0002","sender":"UAV-02","receiver":"USV-01","command":"ROUTE_CHANGE","policy_rule":"RBAC-01","decision":"REJECTED","reason":"SENDER_NOT_AUTHORIZED"}
+{"t_sec":30.0,"message_id":"MSG-0003","sender":"UAV-02","receiver":"CMD-01","command":"SAFETY_TELEMETRY","policy_rule":"RBAC-01","decision":"ACCEPTED","reason":"ROLE_PERMITTED"}
+{"t_sec":60.0,"message_id":"MSG-0004","sender":"UAV-02","receiver":"CMD-01","command":"CONTACT_REPORT","policy_rule":"RBAC-01","decision":"ACCEPTED","reason":"ROLE_PERMITTED"}
+{"t_sec":60.0,"contact_id":"CONTACT-01","evidence":[{"id":"CONTACT-01-OBS-1","source":"UAV-02","finding":"REPORTED"},{"id":"CONTACT-01-OBS-2","source":"USV-02","finding":"NOT_CORROBORATED"},{"id":"CONTACT-01-OBS-3","source":"UAV-01","finding":"NOT_CORROBORATED"}]}
+{"t_sec":90.0,"message_id":"MSG-0005","sender":"UAV-02","receiver":"USV-01","command":"ROUTE_CHANGE","policy_rule":"RBAC-01","decision":"REJECTED","reason":"SENDER_NOT_AUTHORIZED"}
+{"t_sec":90.0,"message_id":"MSG-0006","sender":"UAV-02","receiver":"USV-01","command":"TASK_ASSIGNMENT","policy_rule":"LOCAL-02","decision":"REJECTED","reason":"SCOPED_SENDER_RESTRICTION"}
+{"t_sec":90.0,"message_id":"MSG-0007","sender":"UAV-02","receiver":"CMD-01","command":"REQUEST_TASK","policy_rule":"LOCAL-02","decision":"REJECTED","reason":"SCOPED_SENDER_RESTRICTION"}
+{"t_sec":90.0,"message_id":"MSG-0008","sender":"UAV-02","receiver":"CMD-01","command":"SAFETY_TELEMETRY","policy_rule":"RBAC-01","decision":"ACCEPTED","reason":"ROLE_PERMITTED"}
