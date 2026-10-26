@@ -18,6 +18,6 @@ private:
     ImGuiContext* context_{};
     std::function<void()> draw_;
     double previousTime_{};
-    bool initialized_{false};
+    bool initialized_{false}, fontsWarmed_{false};
 };
 }

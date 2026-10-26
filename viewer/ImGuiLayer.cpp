@@ -83,7 +83,17 @@ void ImGuiLayer::render(osg::RenderInfo& info) {
     const GLenum stores[]={GL_UNPACK_ALIGNMENT,GL_UNPACK_ROW_LENGTH,GL_UNPACK_SKIP_ROWS,GL_UNPACK_SKIP_PIXELS};
     GLint oldStores[4];
     for(int i=0;i<4;++i) { glGetIntegerv(stores[i],&oldStores[i]); glPixelStorei(stores[i],i==0 ? 1 : 0); }
-    ImGui_ImplOpenGL3_NewFrame(); ImGui::NewFrame(); draw_(); ImGui::Render();
+    ImGui_ImplOpenGL3_NewFrame(); ImGui::NewFrame();
+    if(!fontsWarmed_) {
+        // Bake the dashboard's ASCII glyphs at both sizes before the first upload.
+        // High-speed replay must not keep reallocating the atlas between OSG draws.
+        for(float size : {15.f,18.75f}) {
+            auto* baked=ImGui::GetFont()->GetFontBaked(size);
+            for(unsigned c=32;c<127;++c) baked->FindGlyph(ImWchar(c));
+        }
+        fontsWarmed_=true;
+    }
+    draw_(); ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glBindTexture(GL_TEXTURE_2D,GLuint(oldTexture));
     for(int i=0;i<4;++i) glPixelStorei(stores[i],oldStores[i]);

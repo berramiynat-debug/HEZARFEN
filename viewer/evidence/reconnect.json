@@ -1,5 +1,5 @@
 {
-  "applied": 42,
+  "applied": 43,
   "awaiting_snapshot": false,
   "contacts": [],
   "events": [],
@@ -128,11 +128,11 @@
   ],
   "project": "HEZARFEN",
   "security_events": 0,
-  "seq": 42,
+  "seq": 44,
   "snapshots": 2,
   "source_status": "TCP CONNECTED | WAITING FOR SNAPSHOT",
   "stale": false,
   "t_sec": 0.0,
   "ui": "Dear ImGui",
-  "ui_frames": 537
+  "ui_frames": 575
 }

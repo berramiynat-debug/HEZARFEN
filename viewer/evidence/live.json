@@ -9,31 +9,31 @@
     }
   ],
   "events": [
-    "#65 t=3 EV-005 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SENDER_NOT_AUTHORIZED | evidence: MSG-0005",
-    "#66 t=3 EV-006 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0006",
-    "#67 t=3 EV-007 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0007",
-    "#68 t=3 EV-008 UAV-02 MESSAGE_ACCEPTED ACCEPTED\n  SAFETY_TELEMETRY | ROLE_PERMITTED | evidence: MSG-0008",
-    "#75 UAV-03 LINK DOWN | SYNTHETIC_LINK_OUTAGE",
-    "#130 UAV-03 LINK UP | SYNTHETIC_LINK_RESTORED"
+    "#68 t=3 EV-005 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SENDER_NOT_AUTHORIZED | evidence: MSG-0005",
+    "#69 t=3 EV-006 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0006",
+    "#70 t=3 EV-007 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0007",
+    "#71 t=3 EV-008 UAV-02 MESSAGE_ACCEPTED ACCEPTED\n  SAFETY_TELEMETRY | ROLE_PERMITTED | evidence: MSG-0008",
+    "#78 UAV-03 LINK DOWN | SYNTHETIC_LINK_OUTAGE",
+    "#133 UAV-03 LINK UP | SYNTHETIC_LINK_RESTORED"
   ],
   "mode": "LIVE TCP",
   "platforms": [
     {
       "alt_m": 0.0,
       "ecef_m": [
-        4303924.791556492,
-        2241213.8915106393,
+        4303925.254076704,
+        2241213.003307727,
         4125423.9719364806
       ],
       "id": "CMD-01",
       "lat_deg": 40.56,
       "link": "UP",
-      "lon_deg": 27.507671276765922,
+      "lon_deg": 27.50765945261054,
       "sdk_active": true,
       "sdk_id": 1,
       "sdk_position_m": [
-        4303924.791556492,
-        2241213.8915106393,
+        4303925.254076704,
+        2241213.003307727,
         4125423.9719364806
       ],
       "security_state": "Trusted"
@@ -41,111 +41,111 @@
     {
       "alt_m": 210.0,
       "ecef_m": [
-        4303740.508140357,
-        2240977.989590031,
-        4126065.1426937706
+        4303740.1568911355,
+        2240974.293831521,
+        4126067.5004432895
       ],
       "id": "UAV-01",
-      "lat_deg": 40.565981520460085,
+      "lat_deg": 40.56600946934471,
       "link": "UP",
-      "lon_deg": 27.506205670124558,
+      "lon_deg": 27.506168878698944,
       "sdk_active": true,
       "sdk_id": 2,
       "sdk_position_m": [
-        4303740.508140357,
-        2240977.989590031,
-        4126065.1426937706
+        4303740.1568911355,
+        2240974.293831521,
+        4126067.5004432895
       ],
       "security_state": "Trusted"
     },
     {
       "alt_m": 230.0,
       "ecef_m": [
-        4303450.032002448,
-        2241205.6765850256,
-        4126273.9961363305
+        4303448.857036153,
+        2241202.580605482,
+        4126276.883687898
       ],
       "id": "UAV-02",
-      "lat_deg": 40.568303132663715,
+      "lat_deg": 40.56833736291683,
       "link": "UP",
-      "lon_deg": 27.51017455688824,
+      "lon_deg": 27.510148540519225,
       "sdk_active": true,
       "sdk_id": 3,
       "sdk_position_m": [
-        4303450.032002448,
-        2241205.6765850256,
-        4126273.9961363305
+        4303448.857036153,
+        2241202.580605482,
+        4126276.883687898
       ],
       "security_state": "Restricted"
     },
     {
       "alt_m": 250.0,
       "ecef_m": [
-        4303375.042253459,
-        2240980.15299179,
-        4126504.0958407214
+        4303373.1232592,
+        2240977.8678483157,
+        4126507.3163736225
       ],
       "id": "UAV-03",
-      "lat_deg": 40.570876680267375,
+      "lat_deg": 40.57091485915379,
       "link": "UP",
-      "lon_deg": 27.508221538074828,
+      "lon_deg": 27.508208070493342,
       "sdk_active": true,
       "sdk_id": 4,
       "sdk_position_m": [
-        4303375.042253459,
-        2240980.15299179,
-        4126504.0958407214
+        4303373.1232592,
+        2240977.8678483157,
+        4126507.3163736225
       ],
       "security_state": "Trusted"
     },
     {
       "alt_m": 0.0,
       "ecef_m": [
-        4303990.740619837,
-        2240657.4198228214,
-        4125655.875498132
+        4303991.038369308,
+        2240656.4843095583,
+        4125656.071636562
       ],
       "id": "USV-01",
-      "lat_deg": 40.56274889995659,
+      "lat_deg": 40.56275122495699,
       "link": "UP",
-      "lon_deg": 27.501483656261986,
+      "lon_deg": 27.5014722345359,
       "sdk_active": true,
       "sdk_id": 5,
       "sdk_position_m": [
-        4303990.740619837,
-        2240657.4198228214,
-        4125655.875498132
+        4303991.038369308,
+        2240656.4843095583,
+        4125656.071636562
       ],
       "security_state": "Trusted"
     },
     {
       "alt_m": 0.0,
       "ecef_m": [
-        4303720.78339147,
-        2240743.406644336,
-        4125889.2131712134
+        4303720.896196676,
+        2240742.487620513,
+        4125889.592066082
       ],
       "id": "USV-02",
-      "lat_deg": 40.56551491196524,
+      "lat_deg": 40.565519403521115,
       "link": "UP",
-      "lon_deg": 27.503856310321545,
+      "lon_deg": 27.503846069458888,
       "sdk_active": true,
       "sdk_id": 6,
       "sdk_position_m": [
-        4303720.78339147,
-        2240743.406644336,
-        4125889.2131712134
+        4303720.896196676,
+        2240742.487620513,
+        4125889.592066082
       ],
       "security_state": "Trusted"
     }
   ],
   "project": "HEZARFEN",
   "security_events": 8,
-  "seq": 181,
+  "seq": 183,
   "snapshots": 1,
   "source_status": "TCP CONNECTED | WAITING FOR SNAPSHOT",
   "stale": false,
-  "t_sec": 21.6,
+  "t_sec": 21.4,
   "ui": "Dear ImGui",
-  "ui_frames": 631
+  "ui_frames": 760
 }
