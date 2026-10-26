@@ -64,6 +64,7 @@ def finished(handles, name, timeout):
     assert (EVIDENCE / (name + '.png')).stat().st_size > 20000
     report = json.loads((EVIDENCE / (name + '.json')).read_text())
     assert report['ui'] == 'Dear ImGui' and report['ui_frames'] > 0
+    assert report['pause_controls_available']
     assert len(report['platforms']) == 6
     assert all(p['sdk_active'] for p in report['platforms'])
     for p in report['platforms']:
@@ -79,7 +80,7 @@ def main():
     backend_out = (BUILD / 'backend.stdout.log').open('w')
     backend_err = (BUILD / 'backend.stderr.log').open('w')
     record = BUILD / ('session-integration-' + str(time.time_ns()) + '.jsonl')
-    backend = subprocess.Popen([sys.executable, '-m', 'backend.main', '--record', str(record)],
+    backend = subprocess.Popen([sys.executable, '-m', 'viewer.presentation_backend', '--record', str(record)],
         cwd=ROOT, env=ENV, stdout=backend_out, stderr=backend_err,
         creationflags=subprocess.CREATE_NO_WINDOW)
     viewer = None
@@ -110,7 +111,7 @@ def main():
         backend_out = (BUILD / 'backend-restarted.stdout.log').open('w')
         backend_err = (BUILD / 'backend-restarted.stderr.log').open('w')
         record = BUILD / ('session-restarted-' + str(time.time_ns()) + '.jsonl')
-        backend = subprocess.Popen([sys.executable, '-m', 'backend.main', '--record', str(record)],
+        backend = subprocess.Popen([sys.executable, '-m', 'viewer.presentation_backend', '--record', str(record)],
             cwd=ROOT, env=ENV, stdout=backend_out, stderr=backend_err,
             creationflags=subprocess.CREATE_NO_WINDOW)
         wait_for(lambda: 'HEZARFEN ready' in (BUILD / 'backend-restarted.stdout.log').read_text())

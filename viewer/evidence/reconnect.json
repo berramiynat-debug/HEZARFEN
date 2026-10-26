@@ -1,9 +1,12 @@
 {
-  "applied": 43,
+  "applied": 46,
   "awaiting_snapshot": false,
   "contacts": [],
+  "control_error": "",
   "events": [],
   "mode": "LIVE TCP",
+  "pause_controls_available": true,
+  "paused": false,
   "platforms": [
     {
       "alt_m": 0.0,
@@ -134,5 +137,5 @@
   "stale": false,
   "t_sec": 0.0,
   "ui": "Dear ImGui",
-  "ui_frames": 575
+  "ui_frames": 597
 }

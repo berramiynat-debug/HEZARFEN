@@ -75,6 +75,14 @@ The ImGui display dimensions come from the actual graphics window traits. This a
 
 Desktop automation access to the application was not approved, so mouse/keyboard gestures were not exercised automatically. Rendering, native scene state, streaming, stale status, reconnect and replay were verified through application execution and framebuffer/readback evidence.
 
+## Pause/resume update
+
+`viewer/presentation_backend.py` reuses the unmodified backend Runtime with an explicit paused flag. The native Duraklat/Devam et buttons send loopback HTTP requests on a worker thread. Pause holds simulation ticks and the replay cursor, while valid v1 heartbeats keep the observer fresh. The viewer also supports pausing local JSONL playback without skipping/catching up on resume.
+
+Six new Python tests passed: snapshot/time/trust freeze at the 30-second script boundary; no repeated security decision after resume; outage restoration follows simulation time; rejection of scenario injections during pause and Reset clearing pause; replay cursor freeze and completion; HTTP pause/resume with a fresh paused connection and unchanged v1 heartbeat keys. The original 22 backend tests still pass without backend edits. C++ tests now also exercise initially paused replay, a sustained pause, complete delivery after resume and preservation of remaining playback delays.
+
+The compiled `ControlProbe.exe` exercised the exact native WinHTTP client used by the buttons against a real presentation runner: acknowledged pause held time for 1.2 seconds, then resume advanced time. A real SIMDIS viewer was subsequently connected while paused for seven seconds: all six SDK nodes stayed active, all backend positions/time remained identical, controls were available, PAUSED was shown and the observer did not become stale. See the actual [paused framebuffer](evidence/pause.png) and [SDK report](evidence/pause.json). Desktop mouse input remains outside the automated checks.
+
 ## Remaining limits
 
 There are no unresolved compile, link, live TCP, reconnect or offline replay failures in the tested configuration. SDK sometimes prints `GraphicsWindowWin32::grabFocus() - Failed grabbing the focus` for background test launches; the window still creates, renders, captures and exits successfully.

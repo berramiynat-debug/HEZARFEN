@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
     try {
         std::string replay, capture, report, host = "127.0.0.1";
         double speed = 1, quitAfter = 0, captureAt = 5;
-        uint16_t port = 5556;
+        uint16_t port = 5556, controlPort = 8000;
         for (int i = 1; i < argc; ++i) {
             const std::string arg = argv[i];
             auto next = [&]() -> std::string { if (++i >= argc) throw std::runtime_error("missing value for " + arg); return argv[i]; };
@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
             else if (arg == "--speed") speed = positive(next());
             else if (arg == "--host") host = next();
             else if (arg == "--port") { const double n = positive(next()); if (n > 65535 || std::floor(n) != n) throw std::runtime_error("invalid port"); port = uint16_t(n); }
+            else if (arg == "--control-port") { const double n=positive(next()); if(n>65535 || std::floor(n)!=n) throw std::runtime_error("invalid control port"); controlPort=uint16_t(n); }
             else if (arg == "--quit-after") quitAfter = positive(next());
             else if (arg == "--capture") capture = next();
             else if (arg == "--capture-at") captureAt = positive(next());
@@ -64,6 +65,7 @@ int main(int argc, char** argv) {
             else if (arg == "--help") {
                 std::cout << "HEZARFEN | SIMDIS Mission Visualization\n"
                     << "Live (default): --host 127.0.0.1 --port 5556\n"
+                    << "Local pause controls: --control-port 8000 (viewer.presentation_backend)\n"
                     << "Offline: --replay <events.jsonl> [--speed <factor>]\n"
                     << "Validation: --quit-after <seconds> --capture <image.png> --capture-at <seconds> --report <report.json>\n";
                 return 0;
@@ -103,10 +105,12 @@ int main(int argc, char** argv) {
             std::cout << "[HEZARFEN] " << s << std::endl; scene.pushUpdate({{},s,disconnect});
         };
         hezarfen::TcpClient tcp(host,port,[&](const std::string& j) { parser(j); },status);
-        std::atomic<bool> replayStop{false};
+        std::atomic<bool> replayStop{false}, replayPaused{false};
+        if(replay.empty() && host=="127.0.0.1") scene.enableControls(controlPort);
+        else if(!replay.empty()) scene.setReplayPause(&replayPaused);
         std::thread replayThread;
         if (replay.empty()) tcp.start();
-        else replayThread = std::thread([&]() { hezarfen::replayFile(replay,speed,replayStop,[&](const std::string& j) { parser(j); },status); });
+        else replayThread = std::thread([&]() { hezarfen::replayFile(replay,speed,replayStop,[&](const std::string& j) { parser(j); },status,&replayPaused); });
         int result = 0;
         try { result = viewer->run(); }
         catch (...) {

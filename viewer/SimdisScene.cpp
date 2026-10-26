@@ -15,6 +15,7 @@
 namespace hezarfen {
 SimdisScene::SimdisScene(std::string mode) : mode_(std::move(mode)) {}
 SimdisScene::~SimdisScene() {
+    stop();
     if (scene_.valid()) scene_->getScenario()->unbind(&dataStore_);
 }
 void SimdisScene::initialize(simVis::Viewer* viewer) {
@@ -30,11 +31,18 @@ void SimdisScene::pushUpdate(SceneUpdate update) {
     if (queue_.size() >= 1024 && update.message) throw std::runtime_error("render queue overflow; reconnect snapshot required");
     queue_.push_back(std::move(update));
 }
-void SimdisScene::stop() { stopped_ = true; }
+void SimdisScene::enableControls(uint16_t port) {
+    control_=std::make_unique<MissionControl>(port,[this](ControlStatus status) {
+        SceneUpdate update; update.control=std::move(status); pushUpdate(std::move(update));
+    });
+    control_->start();
+}
+void SimdisScene::stop() { stopped_ = true; if(control_) control_->stop(); }
 void SimdisScene::onFrameUpdate() {
     std::deque<SceneUpdate> updates;
     { std::lock_guard<std::mutex> lock(mutex_); updates.swap(queue_); }
     for (const auto& update : updates) {
+        if(update.control) controlStatus_=*update.control;
         if (!update.status.empty()) {
             sourceStatus_ = update.status;
             if (update.disconnect) state_.disconnected(update.status);
@@ -141,7 +149,9 @@ void SimdisScene::home() {
 }
 void SimdisScene::writeReport(const std::string& path) const {
     nlohmann::json j = {{"project","HEZARFEN"},{"ui","Dear ImGui"},{"ui_frames",uiFrames_},{"mode",mode_},{"seq",state_.seq},{"t_sec",state_.time},
-        {"stale",state_.stale},{"awaiting_snapshot",state_.awaitingSnapshot},{"applied",state_.applied},
+        {"stale",state_.stale},{"paused",replayPaused_ ? replayPaused_->load() : controlStatus_.paused},
+        {"pause_controls_available",replayPaused_!=nullptr || controlStatus_.supported},{"control_error",controlStatus_.error},
+        {"awaiting_snapshot",state_.awaitingSnapshot},{"applied",state_.applied},
         {"security_events",state_.securityEvents},{"snapshots",state_.snapshots},{"source_status",sourceStatus_},
         {"platforms",nlohmann::json::array()},{"contacts",nlohmann::json::array()},{"events",state_.events}};
     for (const auto& [id,p] : state_.platforms) {

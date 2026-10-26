@@ -29,7 +29,7 @@ cmake -S viewer -B viewer/build-verified -DSIMDIS_SDK_DIR=C:/SDK -DSIMDIS_DATA_D
 Terminal 1, repository root:
 
 ```powershell
-python -m backend.main --demo
+python -m viewer.presentation_backend --demo
 ```
 
 Terminal 2, repository root:
@@ -40,7 +40,26 @@ Terminal 2, repository root:
 
 The generated launcher sets DLL, GDAL, plugin and SDK model/data paths and launches the compiled Debug executable. Keep the SDK installation and data available. To run the official smoke example, set the same runtime environment then run `viewer/build-verified/Debug/OfficialBasicViewer.exe`.
 
-For interactive controls, start the backend without `--demo` and open its panel at `http://127.0.0.1:8000`. The panel drives backend events. The SIMDIS viewer is a read-only observer. There is no automatic switch from live data to a recording.
+For interactive controls, start `viewer.presentation_backend` without `--demo` and open its panel at `http://127.0.0.1:8000`. The backend panel drives scenario events. The SIMDIS viewer observes the unchanged TCP feed. Its pause/resume buttons use a separate loopback HTTP control channel. There is no automatic switch from live data to a recording.
+
+## Duraklat / Devam et
+
+Use `python -m viewer.presentation_backend --demo` for the presentation, then launch the viewer normally. The header has **Duraklat** and **Devam et** buttons. Pause freezes the actual mission clock, all platform motion, scheduled security scenarios and outage restoration timers. Resume continues from that exact simulation time. Camera controls remain usable while paused; the feed stays connected and sends `HEARTBEAT.running=false` so the scene remains current rather than stale.
+
+The presentation runner subclasses the existing backend Runtime from `viewer/`; it does not modify `backend/`, security rules, or the TCP v1 schema. Pause/resume metadata is exposed only through the existing loopback HTTP service. The C++ WinHTTP client runs off the render thread, waits for actual backend state, and displays PAUSED after acknowledgement. HTTP port defaults to 8000; use `--control-port` in the viewer to match a custom runner `--http-port`.
+
+`python -m backend.main` remains compatible with the viewer, but does not support pause/resume: these buttons are disabled until the pause-aware runner is used. Completed missions cannot be resumed as if paused. While paused, scenario injection buttons are rejected; Reset or selecting a new replay clears pause. Pause does not change trust, contacts, routes or the security audit.
+
+In **offline viewer replay**, the same buttons pause the local replay reader. Relative event delays resume without catching up or skipping events. No backend is required in that mode. A recording's simulation timestamps exclude paused wall-clock time; a later replay does not reproduce the duration spent paused by a presenter.
+
+Additional checks:
+
+```powershell
+python -m unittest viewer.tests.test_presentation_backend -v
+python -m viewer.tests.pause_check
+```
+
+The second command launches the real native client and SDK viewer on temporary ports, checks pause/resume acknowledgement and frozen coordinates, and creates `evidence/pause.png` with `evidence/pause.json`.
 
 ## Offline fallback
 

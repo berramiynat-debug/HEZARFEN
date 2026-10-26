@@ -8,6 +8,7 @@
       "status": "Unverified"
     }
   ],
+  "control_error": "",
   "events": [
     "#546 t=90 EV-005 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SENDER_NOT_AUTHORIZED | evidence: MSG-0005",
     "#547 t=90 EV-006 UAV-02 UNAUTHORIZED_COMMAND REJECTED\n  MISSION_COMMAND | SCOPED_SENDER_RESTRICTION | evidence: MSG-0006",
@@ -17,6 +18,8 @@
     "#791 UAV-03 LINK UP | SYNTHETIC_LINK_RESTORED"
   ],
   "mode": "REPLAY",
+  "pause_controls_available": true,
+  "paused": false,
   "platforms": [
     {
       "alt_m": 0.0,
@@ -147,5 +150,5 @@
   "stale": false,
   "t_sec": 150.0,
   "ui": "Dear ImGui",
-  "ui_frames": 381
+  "ui_frames": 421
 }

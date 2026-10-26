@@ -21,8 +21,13 @@ constexpr auto fixed=ImGuiWindowFlags_NoTitleBar|ImGuiWindowFlags_NoMove|ImGuiWi
 void SimdisScene::drawPanel() {
     ++uiFrames_;
     const auto size=ImGui::GetIO().DisplaySize;
+    const bool paused=replayPaused_ ? replayPaused_->load() : controlStatus_.paused;
+    const bool localReplay=replayPaused_!=nullptr;
+    const bool replayActive=localReplay && sourceStatus_.find("REPLAY COMPLETE")==std::string::npos && sourceStatus_.find("ERROR")==std::string::npos;
+    const bool controlsAvailable=localReplay || (control_ && controlStatus_.supported && !state_.stale);
+    const bool busy=control_ && control_->busy();
     const float panelWidth=std::min(364.f,size.x*.43f);
-    ImGui::SetNextWindowPos({12,12}); ImGui::SetNextWindowSize({size.x-24,62});
+    ImGui::SetNextWindowPos({12,12}); ImGui::SetNextWindowSize({size.x-24,76});
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,{14,7});
     ImGui::Begin("HEZARFEN header",nullptr,fixed);
     ImGui::SetWindowFontScale(1.25f); ImGui::TextColored(cyan,"HEZARFEN"); ImGui::SetWindowFontScale(1);
@@ -36,12 +41,23 @@ void SimdisScene::drawPanel() {
     ImGui::SameLine(); if(ImGui::Button("Focus")) cameraAction_=CameraAction::Selected;
     ImGui::SameLine(); if(ImGui::Button("3D")) cameraAction_=CameraAction::Perspective;
     ImGui::SameLine(); if(ImGui::Button("2D")) cameraAction_=CameraAction::Overhead;
+    ImGui::SetCursorPos({std::max(430.f,size.x-605),42});
+    ImGui::BeginDisabled(!controlsAvailable || busy || paused || (localReplay ? !replayActive : !controlStatus_.running));
+    if(ImGui::Button("Duraklat")) { if(localReplay) replayPaused_->store(true); else control_->request("pause"); }
+    ImGui::EndDisabled(); ImGui::SameLine();
+    ImGui::BeginDisabled(!controlsAvailable || busy || !paused);
+    if(ImGui::Button("Devam et")) { if(localReplay) replayPaused_->store(false); else control_->request("resume"); }
+    ImGui::EndDisabled(); ImGui::SameLine();
+    if(paused) ImGui::TextColored(amber,"PAUSED");
+    else if(busy) ImGui::TextDisabled("Applying...");
+    else if(!controlsAvailable) ImGui::TextDisabled("Controls unavailable");
     ImGui::End(); ImGui::PopStyleVar();
 
-    ImGui::SetNextWindowPos({12,84}); ImGui::SetNextWindowSize({panelWidth,std::max(240.f,size.y-96)});
+    ImGui::SetNextWindowPos({12,98}); ImGui::SetNextWindowSize({panelWidth,std::max(240.f,size.y-110)});
     ImGui::Begin("Mission monitor",nullptr,fixed);
     ImGui::TextColored(state_.stale ? red : cyan,state_.stale ? "STALE DATA" : "DATA CURRENT");
-    ImGui::SameLine(); ImGui::TextColored(muted," / %s",state_.running ? (*state_.running ? "RUNNING" : "IDLE") : "SYNCHRONIZING");
+    ImGui::SameLine(); ImGui::TextColored(muted," / %s",paused ? "PAUSED" : state_.running ? (*state_.running ? "RUNNING" : "IDLE") : "SYNCHRONIZING");
+    if(control_ && !controlStatus_.error.empty()) ImGui::TextWrapped("Controls: %s",controlStatus_.error.c_str());
     if(state_.stale) ImGui::TextWrapped("%s",state_.status.c_str());
     if(mode_=="REPLAY" && !sourceStatus_.empty()) ImGui::TextWrapped("%s",sourceStatus_.c_str());
     if(!state_.runId.empty()) ImGui::TextWrapped("Run: %s",state_.runId.c_str());

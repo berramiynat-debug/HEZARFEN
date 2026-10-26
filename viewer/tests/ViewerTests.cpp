@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cmath>
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
@@ -21,6 +22,28 @@ void check(bool value, const char* why) { ++checks; if (!value) throw std::runti
 template<class Fn> void rejects(Fn f) { bool threw=false; try { f(); } catch (const std::exception&) { threw=true; } check(threw,"invalid input accepted"); }
 bool sendAll(SOCKET s, const char* bytes, int count) {
     int offset=0; while (offset<count) { int n=send(s,bytes+offset,count-offset,0); if(n<=0) return false; offset+=n; } return true;
+}
+void replayPause(const std::string& snapshot) {
+    const auto path=std::filesystem::temp_directory_path()/std::filesystem::path("hezarfen-replay-pause-"+std::to_string(std::chrono::steady_clock::now().time_since_epoch().count())+".jsonl");
+    { std::ofstream out(path); out<<snapshot<<"\n"
+        <<R"({"v":1,"type":"HEARTBEAT","seq":2,"t_sec":2,"data":{"running":true}})"<<"\n"
+        <<R"({"v":1,"type":"HEARTBEAT","seq":3,"t_sec":4,"data":{"running":false}})"<<"\n"; }
+    std::atomic<bool> stop{false},paused{true}; std::atomic<int> count{0};
+    std::thread replay([&]{replayFile(path.string(),10,stop,[&](const auto&){++count;},[](const auto&,bool){},&paused);});
+    std::this_thread::sleep_for(100ms); const bool initiallyFrozen=count==0;
+    paused=false;
+    const auto deadline=std::chrono::steady_clock::now()+2s;
+    while(count<1 && std::chrono::steady_clock::now()<deadline) std::this_thread::sleep_for(1ms);
+    paused=true; std::this_thread::sleep_for(40ms); const int before=count;
+    std::this_thread::sleep_for(250ms); const bool held=count==before && count==1;
+    const auto resumed=std::chrono::steady_clock::now(); paused=false;
+    while(count<3 && std::chrono::steady_clock::now()<deadline) std::this_thread::sleep_for(1ms);
+    const auto resumedDuration=std::chrono::steady_clock::now()-resumed;
+    stop=true;replay.join();std::filesystem::remove(path);
+    check(initiallyFrozen,"replay emitted while initially paused");
+    check(held,"replay advanced while paused");
+    check(count==3,"replay lost or duplicated events on resume");
+    check(resumedDuration>200ms,"replay caught up instead of preserving remaining delays");
 }
 void transport(const std::string& snapshot) {
     WSADATA data{}; check(WSAStartup(MAKEWORD(2,2),&data)==0,"WSA startup");
@@ -121,6 +144,7 @@ int main(int argc,char** argv) {
             check(std::abs(roundtrip.yaw()*simCore::RAD2DEG-p.heading_deg)<1e-4,"heading roundtrip");
         }
         auto equator=toEcef(0,0,0,0); check(std::abs(equator.x()-6378137)<1e-5 && std::abs(equator.y())<1e-5,"known WGS84 ECEF point");
+        replayPause(first);
         transport(unicode.dump());
         std::cout << "PASS " << checks << " checks; " << count << " actual backend messages; coordinates, state, UTF-8, fragmented TCP, oversized-frame reconnect, shutdown\n";
         return 0;

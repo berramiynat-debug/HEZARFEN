@@ -34,7 +34,8 @@ std::size_t validateReplay(const std::string& path) {
     return count;
 }
 void replayFile(const std::string& path, double speed, std::atomic<bool>& stop,
-                const MessageCallback& message, const StatusCallback& status) {
+                const MessageCallback& message, const StatusCallback& status,
+                const std::atomic<bool>* paused) {
     std::ifstream in(path,std::ios::binary); std::string line;
     auto due = std::chrono::steady_clock::now(); double previous = 0; bool first = true;
     try {
@@ -44,8 +45,13 @@ void replayFile(const std::string& path, double speed, std::atomic<bool>& stop,
             if (!first) due += std::chrono::duration_cast<std::chrono::steady_clock::duration>(
                 std::chrono::duration<double>(std::max(0.0,m.t_sec - previous) / speed));
             first = false; previous = m.t_sec;
-            while (!stop && std::chrono::steady_clock::now() < due)
+            while (!stop) {
+                const bool frozen=paused && paused->load();
+                const auto before=std::chrono::steady_clock::now();
+                if(!frozen && before>=due) break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                if(frozen) due+=std::chrono::steady_clock::now()-before;
+            }
             if (!stop) message(line);
         }
         if (!stop) status("REPLAY COMPLETE | recorded synthetic scenario",false);
