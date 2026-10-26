@@ -88,6 +88,14 @@ int main(int argc,char** argv) {
         std::ifstream in(argv[1]); std::string first; std::getline(in,first);
         const auto snapshot=parseMessage(first);
         check(snapshot.platforms.size()==6,"snapshot must contain six platforms");
+        // An immediate restart can have the same t=0 as the previous mission.
+        MissionState atZero; check(atZero.apply(snapshot),"initial zero-time snapshot");
+        std::string firstDecision; std::getline(in,firstDecision);
+        check(atZero.apply(parseMessage(firstDecision)),"initial mission decision");
+        check(!atZero.events.empty(),"initial decision not logged");
+        auto zeroRestart=snapshot; zeroRestart.seq=atZero.seq+1;
+        check(atZero.apply(zeroRestart),"zero-time restart snapshot rejected");
+        check(atZero.events.empty(),"previous mission events survived zero-time restart");
         check(validateReplay(argv[1])>900,"complete recording validation");
         MissionState state;
         auto hb=parseMessage(R"({"v":1,"type":"HEARTBEAT","seq":2,"t_sec":0,"data":{"running":false}})");

@@ -135,7 +135,7 @@ bool MissionState::apply(const Message& m) {
     }
     if (snapshot) {
         platforms.clear(); contacts.clear(); running.reset(); ++snapshots;
-        if (awaitingSnapshot || m.t_sec < time || m.run_id != runId) events.clear();
+        if (awaitingSnapshot || m.t_sec == 0 || m.t_sec < time || m.run_id != runId) events.clear();
         awaitingSnapshot = false; stale = false;
     } else if (m.t_sec < time) {
         disconnected("TIME RESET WITHOUT SNAPSHOT"); return false;

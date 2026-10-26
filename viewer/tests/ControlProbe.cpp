@@ -28,8 +28,10 @@ int main(int argc,char** argv) {
         const auto still=read();
         if(!still.paused || std::abs(still.time-paused.time)>1e-9) throw std::runtime_error("clock advanced while paused");
         control.request("resume"); wait([&](const auto& s){return !s.paused && s.running && s.time>paused.time;});
+        control.request("restart");
+        wait([&](const auto& s){return s.restartSupported && !s.paused && s.running && s.time<.5 && !control.busy();});
         control.stop();
-        std::cout<<"PASS native WinHTTP pause/resume: acknowledged pause freezes time; resume advances from same time\n";
+        std::cout<<"PASS native WinHTTP pause/resume/restart: frozen time, resume, then fresh automatic mission at zero\n";
         return 0;
     } catch(const std::exception& e) { std::cerr<<"FAIL "<<e.what()<<"\n";return 1; }
 }

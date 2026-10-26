@@ -9,6 +9,7 @@ from pathlib import Path
 import signal
 
 from backend.main import DEMO, Runtime
+from backend.simulator import Simulator
 
 
 class PresentationRuntime(Runtime):
@@ -21,6 +22,18 @@ class PresentationRuntime(Runtime):
         self.emit('HEARTBEAT', {'running': self.sim.running and not self.paused})
 
     def action(self, action):
+        if action == 'restart':
+            self.close_replay()
+            self.sim = Simulator(self.seed)
+            self.time = 0.0
+            self.mode = 'LIVE'
+            self.scripted = True
+            self.paused = False
+            self.log.clear()
+            self.checkpoint()
+            super().action('start')
+            self.emit('HEARTBEAT', {'running': True})
+            return
         if action == 'pause':
             if self.mode not in {'LIVE', 'REPLAY'} or not (self.sim.running or self.mode == 'REPLAY'):
                 raise ValueError('No active mission to pause')
@@ -53,7 +66,7 @@ class PresentationRuntime(Runtime):
 
     def status(self):
         state = super().status()
-        state.update(paused=self.paused, pause_supported=True,
+        state.update(paused=self.paused, pause_supported=True, restart_supported=True,
                      running=self.sim.running and not self.paused)
         return state
 

@@ -11,6 +11,7 @@ struct ControlStatus {
     bool supported{false}, paused{false}, running{false};
     double time{};
     std::string error;
+    bool restartSupported{false};
 };
 // Dedicated loopback HTTP control channel. TCP remains an unchanged observer feed.
 class MissionControl {

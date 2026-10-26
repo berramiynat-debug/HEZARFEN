@@ -35,7 +35,7 @@ MissionControl::~MissionControl() { stop(); }
 void MissionControl::start() { if(!worker_.joinable()) { stop_=false; worker_=std::thread(&MissionControl::run,this); } }
 void MissionControl::stop() { stop_=true; wake_.notify_all(); if(worker_.joinable()) worker_.join(); }
 void MissionControl::request(const std::string& action) {
-    if(action!="pause" && action!="resume") return;
+    if(action!="pause" && action!="resume" && action!="restart") return;
     if(busy_.exchange(true)) return;
     { std::lock_guard<std::mutex> lock(mutex_); action_=action; }
     wake_.notify_one();
@@ -58,6 +58,7 @@ void MissionControl::run() {
             }
             const auto state=nlohmann::json::parse(httpRequest(connection.value,L"GET",L"/state"));
             current.supported=state.value("pause_supported",false);
+            current.restartSupported=state.value("restart_supported",false);
             current.paused=state.value("paused",false);
             current.running=state.at("running").get<bool>(); current.time=state.at("t_sec").get<double>();
             current.error=actionError;

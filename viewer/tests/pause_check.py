@@ -48,6 +48,7 @@ def main():
         assert current['t_sec'] == frozen['t_sec'] and current['platforms'] == frozen['platforms']
         report = json.loads((EVIDENCE / 'pause.json').read_text())
         assert report['paused'] and report['pause_controls_available'] and not report['stale']
+        assert report['restart_controls_available']
         assert report['t_sec'] == frozen['t_sec'] and all(p['sdk_active'] for p in report['platforms'])
         assert (EVIDENCE / 'pause.png').stat().st_size > 20000
         action('resume')

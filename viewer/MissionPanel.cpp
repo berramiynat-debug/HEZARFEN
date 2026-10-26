@@ -48,6 +48,12 @@ void SimdisScene::drawPanel() {
     ImGui::BeginDisabled(!controlsAvailable || busy || !paused);
     if(ImGui::Button("Devam et")) { if(localReplay) replayPaused_->store(false); else control_->request("resume"); }
     ImGui::EndDisabled(); ImGui::SameLine();
+    if(!localReplay) {
+        ImGui::BeginDisabled(!controlsAvailable || busy || !controlStatus_.restartSupported);
+        if(ImGui::Button("Yeniden baslat")) control_->request("restart");
+        if(ImGui::IsItemHovered()) ImGui::SetTooltip("150 saniyelik canli senaryoyu sifirdan baslatir.");
+        ImGui::EndDisabled(); ImGui::SameLine();
+    }
     if(paused) ImGui::TextColored(amber,"PAUSED");
     else if(busy) ImGui::TextDisabled("Applying...");
     else if(!controlsAvailable) ImGui::TextDisabled("Controls unavailable");

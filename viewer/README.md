@@ -42,11 +42,11 @@ The generated launcher sets DLL, GDAL, plugin and SDK model/data paths and launc
 
 For interactive controls, start `viewer.presentation_backend` without `--demo` and open its panel at `http://127.0.0.1:8000`. The backend panel drives scenario events. The SIMDIS viewer observes the unchanged TCP feed. Its pause/resume buttons use a separate loopback HTTP control channel. There is no automatic switch from live data to a recording.
 
-## Duraklat / Devam et
+## Duraklat / Devam et / Yeniden baslat
 
-Use `python -m viewer.presentation_backend --demo` for the presentation, then launch the viewer normally. The header has **Duraklat** and **Devam et** buttons. Pause freezes the actual mission clock, all platform motion, scheduled security scenarios and outage restoration timers. Resume continues from that exact simulation time. Camera controls remain usable while paused; the feed stays connected and sends `HEARTBEAT.running=false` so the scene remains current rather than stale.
+Use `python -m viewer.presentation_backend --demo` for the presentation, then launch the viewer normally. **Yeniden baslat** in the SIMDIS window starts a fresh live 150-second automatic mission, including when the previous mission has finished or is paused. It resets positions, contacts, trust and links, clears pause and re-enables the complete automatic event schedule. The observer stays connected; message sequence numbers continue increasing and prior recordings remain preserved. This is a fresh simulation run, not playback of a recording. The header has **Duraklat** and **Devam et** buttons. Pause freezes the actual mission clock, all platform motion, scheduled security scenarios and outage restoration timers. Resume continues from that exact simulation time. Camera controls remain usable while paused; the feed stays connected and sends `HEARTBEAT.running=false` so the scene remains current rather than stale.
 
-The presentation runner subclasses the existing backend Runtime from `viewer/`; it does not modify `backend/`, security rules, or the TCP v1 schema. Pause/resume metadata is exposed only through the existing loopback HTTP service. The C++ WinHTTP client runs off the render thread, waits for actual backend state, and displays PAUSED after acknowledgement. HTTP port defaults to 8000; use `--control-port` in the viewer to match a custom runner `--http-port`.
+The presentation runner subclasses the existing backend Runtime from `viewer/`; it does not modify `backend/`, security rules, or the TCP v1 schema. Pause/resume/restart metadata is exposed only through the existing loopback HTTP service. Restart is enabled only when the runner advertises `restart_supported`; older runners need a restart to load the new code. The C++ WinHTTP client runs off the render thread, waits for actual backend state, and displays PAUSED after acknowledgement. HTTP port defaults to 8000; use `--control-port` in the viewer to match a custom runner `--http-port`.
 
 `python -m backend.main` remains compatible with the viewer, but does not support pause/resume: these buttons are disabled until the pause-aware runner is used. Completed missions cannot be resumed as if paused. While paused, scenario injection buttons are rejected; Reset or selecting a new replay clears pause. Pause does not change trust, contacts, routes or the security audit.
 
@@ -59,7 +59,7 @@ python -m unittest viewer.tests.test_presentation_backend -v
 python -m viewer.tests.pause_check
 ```
 
-The second command launches the real native client and SDK viewer on temporary ports, checks pause/resume acknowledgement and frozen coordinates, and creates `evidence/pause.png` with `evidence/pause.json`.
+The second command launches the real native client and SDK viewer on temporary ports, checks pause/resume/restart acknowledgement and frozen coordinates, and creates `evidence/pause.png` with `evidence/pause.json`.
 
 ## Offline fallback
 

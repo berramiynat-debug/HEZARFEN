@@ -143,6 +143,7 @@
     }
   ],
   "project": "HEZARFEN",
+  "restart_controls_available": false,
   "security_events": 8,
   "seq": 913,
   "snapshots": 1,
@@ -150,5 +151,5 @@
   "stale": false,
   "t_sec": 150.0,
   "ui": "Dear ImGui",
-  "ui_frames": 421
+  "ui_frames": 365
 }

@@ -51,7 +51,9 @@ void SimdisScene::onFrameUpdate() {
             renderState();
             if (update.message->security || update.message->link || update.message->type == "CONTACT_EVENT")
                 std::cout << "[HEZARFEN] " << state_.events.back() << std::endl;
-            if (!positioned_ && !state_.platforms.empty()) { home(); positioned_ = true; }
+            const bool newMission=update.message->type=="SNAPSHOT" && update.message->t_sec==0;
+            if(newMission) { eventFilter_[0]='\0'; shownEvent_.clear(); }
+            if ((!positioned_ || newMission) && !state_.platforms.empty()) { home(); positioned_ = true; }
         }
     }
     switch (cameraAction_) {
@@ -150,6 +152,7 @@ void SimdisScene::home() {
 void SimdisScene::writeReport(const std::string& path) const {
     nlohmann::json j = {{"project","HEZARFEN"},{"ui","Dear ImGui"},{"ui_frames",uiFrames_},{"mode",mode_},{"seq",state_.seq},{"t_sec",state_.time},
         {"stale",state_.stale},{"paused",replayPaused_ ? replayPaused_->load() : controlStatus_.paused},
+        {"restart_controls_available",control_!=nullptr && controlStatus_.restartSupported},
         {"pause_controls_available",replayPaused_!=nullptr || controlStatus_.supported},{"control_error",controlStatus_.error},
         {"awaiting_snapshot",state_.awaitingSnapshot},{"applied",state_.applied},
         {"security_events",state_.securityEvents},{"snapshots",state_.snapshots},{"source_status",sourceStatus_},

@@ -1,5 +1,5 @@
 {
-  "applied": 46,
+  "applied": 45,
   "awaiting_snapshot": false,
   "contacts": [],
   "control_error": "",
@@ -130,6 +130,7 @@
     }
   ],
   "project": "HEZARFEN",
+  "restart_controls_available": true,
   "security_events": 0,
   "seq": 44,
   "snapshots": 2,
@@ -137,5 +138,5 @@
   "stale": false,
   "t_sec": 0.0,
   "ui": "Dear ImGui",
-  "ui_frames": 597
+  "ui_frames": 576
 }

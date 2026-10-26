@@ -83,6 +83,12 @@ Six new Python tests passed: snapshot/time/trust freeze at the 30-second script 
 
 The compiled `ControlProbe.exe` exercised the exact native WinHTTP client used by the buttons against a real presentation runner: acknowledged pause held time for 1.2 seconds, then resume advanced time. A real SIMDIS viewer was subsequently connected while paused for seven seconds: all six SDK nodes stayed active, all backend positions/time remained identical, controls were available, PAUSED was shown and the observer did not become stale. See the actual [paused framebuffer](evidence/pause.png) and [SDK report](evidence/pause.json). Desktop mouse input remains outside the automated checks.
 
+## Native mission restart
+
+The SIMDIS header now includes **Yeniden baslat**, alongside Duraklat and Devam et. The live control client sends `/action/restart` to the presentation runner. A new Simulator is created with the same seed, time resets to zero, contacts/evidence/restrictions/outages are cleared, pause is cleared, and the full 150-second automatic schedule starts again. TCP sequence numbers continue monotonically and audit/record files are not overwritten. Backend files and recordings remain unchanged.
+
+Two additional runtime tests verify restart after a completed demo through the entire second 150-second timeline, and restart during a paused outage with Restricted state and contacts. The HTTP integration test verifies the fresh six-platform SNAPSHOT at t=0 with an increasing sequence. The native ControlProbe also sends restart through the same WinHTTP client used by the button. The C++ state tests cover an immediate t=0 restart clearing the prior mission event list. The restart button requires the runner's explicit `restart_supported` capability; local offline replay retains its separate playback controls.
+
 ## Remaining limits
 
 There are no unresolved compile, link, live TCP, reconnect or offline replay failures in the tested configuration. SDK sometimes prints `GraphicsWindowWin32::grabFocus() - Failed grabbing the focus` for background test launches; the window still creates, renders, captures and exits successfully.
